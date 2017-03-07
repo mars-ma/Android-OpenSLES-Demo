@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 #include <jni.h>
-#include <android/log.h>
+#include "log.h"
 #include "opensl_io.h"
 
-#define LOG(...) __android_log_print(ANDROID_LOG_DEBUG,"dev_mars",__VA_ARGS__)
+
 
 #define SAMPLERATE 44100
 #define CHANNELS 1
@@ -22,18 +22,20 @@ extern "C" {
 JNIEXPORT void JNICALL
 Java_dev_mars_openslesdemo_NativeBridge_startRecord(JNIEnv *env, jobject instance) {
     jclass native_bridge_class = env->GetObjectClass(instance);
+    //此方法用于设置录音状况的同步标记
     jmethodID method_id_setIsRecording = env->GetMethodID(native_bridge_class,"setIsRecording","(Z)V");
 
     FILE * fp = fopen(TEST_CAPTURE_FILE_PATH, "wb"); //创建文件
     if( fp == NULL ) {
         LOG("cannot open file (%s)\n", TEST_CAPTURE_FILE_PATH);
+        //设置状态录音状态为:空闲
         env->CallVoidMethod(instance,method_id_setIsRecording, false);
         return ;
     }else{
         LOG("open file %s",TEST_CAPTURE_FILE_PATH);
     }
-
-    OPENSL_STREAM* stream = android_OpenAudioDevice(SAMPLERATE, CHANNELS, CHANNELS, FRAME_SIZE); //创建OPENSL流对象
+    //创建OPENSL流对象，创建该对象完毕后，录音和播放引擎也被创建
+    OPENSL_STREAM* stream = android_OpenAudioDevice(SAMPLERATE, CHANNELS, CHANNELS, FRAME_SIZE);
     if (stream == NULL) {
         fclose(fp);
         LOG("failed to open audio device ! \n");

@@ -27,6 +27,7 @@
 */
 
 #include "opensl_io.h"
+#include "log.h"
 
 #define CONV16BIT 32768
 #define CONVMYFLT (1./32768.)
@@ -413,6 +414,7 @@ double android_GetTimestamp(OPENSL_STREAM *p)
 // this callback handler is called every time a buffer finishes recording
 void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
+    LOG("bqRecorderCallback");
     OPENSL_STREAM *p = (OPENSL_STREAM *) context;
     notifyThreadLock(p->inlock);
 }
@@ -443,6 +445,7 @@ int android_AudioIn(OPENSL_STREAM *p,short *buffer,int size)
 // this callback handler is called every time a buffer finishes playing
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
+    LOG("bqPlayerCallback");
     OPENSL_STREAM *p = (OPENSL_STREAM *) context;
     notifyThreadLock(p->outlock);
 }
