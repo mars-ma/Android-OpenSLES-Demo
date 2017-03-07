@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="dev.mars.openslesdemo.MainActivity">
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="startRecord"
+        android:layout_alignParentTop="true"
+        android:text="Start_Record"
+        />
+
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="stopRecord"
+        android:layout_below="@+id/btnStart"
+        android:text="Stop_Record"
+        />
+
+    <Button
+        android:id="@+id/btnStartPlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="startPlay"
+        android:layout_below="@+id/btnStop"
+        android:text="Start_Play"
+        />
+
+    <Button
+        android:id="@+id/btnStopPlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="stopPlay"
+        android:layout_below="@+id/btnStartPlay"
+        android:text="Stop_Play"
+        />
+</RelativeLayout>
