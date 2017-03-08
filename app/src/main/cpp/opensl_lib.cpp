@@ -8,34 +8,50 @@
 
 
 
-#define SAMPLERATE 44100
+/*#define SAMPLERATE 44100
 #define CHANNELS 1
 #define PERIOD_TIME 20 //ms
 #define FRAME_SIZE SAMPLERATE*PERIOD_TIME/1000
 #define BUFFER_SIZE FRAME_SIZE*CHANNELS
-#define TEST_CAPTURE_FILE_PATH "/sdcard/audio.pcm"
+#define TEST_CAPTURE_FILE_PATH "/sdcard/audio.pcm"*/
+
+/*static int SAMPLERATE;
+static int CHANNELS;
+static int PERIOD_TIME;
+static int FRAME_SIZE;
+static int BUFFER_SIZE;*/
 
 static volatile int g_loop_exit = 0;
 
+struct OpenSLEngine{
+
+};
+
 extern "C" {
 
+
+
 JNIEXPORT void JNICALL
-Java_dev_mars_openslesdemo_NativeBridge_startRecord(JNIEnv *env, jobject instance) {
+Java_dev_mars_openslesdemo_OpenSLNative_startRecording(JNIEnv *env, jobject instance,jint sampleRate,jint periodTime,jint channels,jstring audioPath) {
+    const char * audio_path = env->GetStringUTFChars(audioPath,NULL);
     jclass native_bridge_class = env->GetObjectClass(instance);
     //此方法用于设置录音状况的同步标记
     jmethodID method_id_setIsRecording = env->GetMethodID(native_bridge_class,"setIsRecording","(Z)V");
 
-    FILE * fp = fopen(TEST_CAPTURE_FILE_PATH, "wb"); //创建文件
+    //以只写方式打开或新建一个二进制文件，只允许写数据。
+    FILE * fp = fopen(audio_path, "wb"); //创建文件
     if( fp == NULL ) {
-        LOG("cannot open file (%s)\n", TEST_CAPTURE_FILE_PATH);
+        LOG("cannot open file (%s)\n", audio_path);
         //设置状态录音状态为:空闲
         env->CallVoidMethod(instance,method_id_setIsRecording, false);
         return ;
     }else{
-        LOG("open file %s",TEST_CAPTURE_FILE_PATH);
+        LOG("open file %s",audio_path);
     }
-    //创建OPENSL流对象，创建该对象完毕后，录音和播放引擎也被创建
-    OPENSL_STREAM* stream = android_OpenAudioDevice(SAMPLERATE, CHANNELS, CHANNELS, FRAME_SIZE);
+
+    //参数依次为采样率、频道数量、录入频道数量、播放频道数量，每帧的大学，模式
+    int FRAME_SIZE = sampleRate*periodTime/1000;
+    OPENSL_STREAM* stream = android_OpenAudioDevice(sampleRate, channels, channels,FRAME_SIZE ,RECORD_MODE);
     if (stream == NULL) {
         fclose(fp);
         LOG("failed to open audio device ! \n");
@@ -43,11 +59,11 @@ Java_dev_mars_openslesdemo_NativeBridge_startRecord(JNIEnv *env, jobject instanc
         return ;
     }
 
-
     LOG("IN RECORDING STATE");
-
-
+    env->CallVoidMethod(instance,method_id_setIsRecording, true);
     int samples;
+    //缓冲数组,一个short表示16bit位宽
+    int BUFFER_SIZE = FRAME_SIZE*channels;
     short buffer[BUFFER_SIZE];
     g_loop_exit = 0;
     while (!g_loop_exit) {
@@ -71,38 +87,37 @@ Java_dev_mars_openslesdemo_NativeBridge_startRecord(JNIEnv *env, jobject instanc
 }
 
 JNIEXPORT void JNICALL
-Java_dev_mars_openslesdemo_NativeBridge_stopRecord(JNIEnv *env, jobject instance) {
-
+Java_dev_mars_openslesdemo_OpenSLNative_stopRecording(JNIEnv *env, jobject instance) {
     g_loop_exit = 1;
 }
 
 JNIEXPORT void JNICALL
-Java_dev_mars_openslesdemo_NativeBridge_playRecord(JNIEnv *env, jobject instance) {
+Java_dev_mars_openslesdemo_OpenSLNative_playRecording(JNIEnv *env, jobject instance,jint sampleRate,jint periodTime,jint channels,jstring audioPath) {
+    const char * audio_path = env->GetStringUTFChars(audioPath,NULL);
     jclass native_bridge_class = env->GetObjectClass(instance);
     jmethodID method_id_setIsPlaying = env->GetMethodID(native_bridge_class,"setIsPlaying","(Z)V");
 
-
-    FILE * fp = fopen(TEST_CAPTURE_FILE_PATH, "rb");
+    FILE * fp = fopen(audio_path, "rb");
     if( fp == NULL ) {
-        LOG("cannot open file (%s) !\n",TEST_CAPTURE_FILE_PATH);
+        LOG("cannot open file (%s) !\n",audio_path);
         env->CallVoidMethod(instance,method_id_setIsPlaying, false);
         return ;
     }else{
-        LOG("open file %s",TEST_CAPTURE_FILE_PATH);
+        LOG("open file %s",audio_path);
     }
 
-    OPENSL_STREAM* stream = android_OpenAudioDevice(SAMPLERATE, CHANNELS, CHANNELS, FRAME_SIZE);
+    int FRAME_SIZE = sampleRate*periodTime/1000;
+    OPENSL_STREAM* stream = android_OpenAudioDevice(sampleRate, channels, channels, FRAME_SIZE,PLAY_MODE);
     if (stream == NULL) {
         fclose(fp);
         LOG("failed to open audio device ! \n");
         env->CallVoidMethod(instance,method_id_setIsPlaying, false);
         return ;
     }
-
-
-
-
+    LOG("In playing state");
+    env->CallVoidMethod(instance,method_id_setIsPlaying, true);
     int samples;
+    int BUFFER_SIZE = FRAME_SIZE*channels;
     short buffer[BUFFER_SIZE];
     g_loop_exit = 0;
     while (!g_loop_exit && !feof(fp)) {
@@ -121,16 +136,13 @@ Java_dev_mars_openslesdemo_NativeBridge_playRecord(JNIEnv *env, jobject instance
     fclose(fp);
     env->CallVoidMethod(instance,method_id_setIsPlaying, false);
     LOG("native playRecord completed !");
-
     return ;
 }
 
 JNIEXPORT void JNICALL
-Java_dev_mars_openslesdemo_NativeBridge_stopPlay(JNIEnv *env, jobject instance) {
-
+Java_dev_mars_openslesdemo_OpenSLNative_stopPlaying(JNIEnv *env, jobject instance) {
     g_loop_exit = 1;
     return ;
-
 }
 
 }

@@ -8,44 +8,42 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainActivity extends AppCompatActivity {
     String[] pers = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO};
-    ExecutorService executor = Executors.newSingleThreadExecutor();
-    // Used to load the 'native-lib' library on application startup.
-    NativeBridge nativeBridge = new NativeBridge();
-
-
+    private OpenSLRecorder recorder;
+    private OpenSLPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        recorder = new OpenSLRecorder();
+        player = new OpenSLPlayer();
     }
 
 
     public void startRecord(View view) {
-        if(!nativeBridge.isRecording()) {
-            if (hasPermission()) {
-                launchRecordThread();
-            } else {
-                requestPermissions();
-            }
-        }else{
-            Toast.makeText(MainActivity.this,"Already in recording state!",Toast.LENGTH_SHORT).show();
+        if (hasPermission()) {
+            startToRecord();
+        } else {
+            requestPermissions();
         }
     }
 
-
+    public void startToRecord(){
+        if(!recorder.startToRecord(Common.SAMPLERATE,Common.PERIOD_TIME,Common.CHANNELS,Common.DEFAULT_AUDIO_FILE_PATH)){
+            Toast.makeText(MainActivity.this,"Already in recording state!",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(MainActivity.this,"Start recording!",Toast.LENGTH_SHORT).show();
+        }
+    }
 
     public void stopRecord(View view) {
-        if(nativeBridge.isRecording()) {
-            nativeBridge.stopRecord();
-        }else{
+        if(!recorder.stopRecording()){
             Toast.makeText(MainActivity.this,"Not in recording state!",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(MainActivity.this,"Recording stopped!",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -55,22 +53,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void launchRecordThread(){
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                nativeBridge.setIsRecording(true);
-                nativeBridge.startRecord();
-            }
-        };
-        executor.execute(runnable);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode==0){
             if(hasPermission()){
-                launchRecordThread();
+                startToRecord();
             }else{
                 Toast.makeText(MainActivity.this,"Unable to get permissions",Toast.LENGTH_SHORT).show();
             }
@@ -99,28 +86,18 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void startPlay(View view) {
-
-        if(nativeBridge.isPlaying()){
+        if(!player.startToPlay(Common.SAMPLERATE,Common.PERIOD_TIME,Common.CHANNELS,Common.DEFAULT_AUDIO_FILE_PATH)){
             Toast.makeText(MainActivity.this,"Is playing!",Toast.LENGTH_SHORT).show();
         }else{
-
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    nativeBridge.setIsPlaying(true);
-                    nativeBridge.playRecord();
-                }
-            };
-            executor.execute(runnable);
-
+            Toast.makeText(MainActivity.this,"Start playing!",Toast.LENGTH_SHORT).show();
         }
     }
 
     public void stopPlay(View view) {
-        if(nativeBridge.isPlaying()){
-            nativeBridge.stopPlay();
+        if(!player.stopPlaying()){
+            Toast.makeText(MainActivity.this,"Not playing!",Toast.LENGTH_SHORT).show();
         }else{
-            Toast.makeText(MainActivity.this,"Not play!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this,"Playing stopped!",Toast.LENGTH_SHORT).show();
         }
     }
 }

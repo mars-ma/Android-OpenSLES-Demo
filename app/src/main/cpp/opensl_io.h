@@ -33,6 +33,9 @@
 #include <pthread.h>
 #include <stdlib.h>
 
+#define RECORD_MODE 0
+#define PLAY_MODE 1
+
 typedef struct threadLock_ {
     pthread_mutex_t m;
     pthread_cond_t  c;
@@ -76,17 +79,17 @@ typedef struct opensl_stream {
     short *inputBuffer[2];
 
     // size of buffers
-    int outBufSamples;
-    int inBufSamples;
+    int outBufSamples; //播放缓冲数组的大小
+    int inBufSamples;  //录入缓冲数组的大小
 
     // locks
-    void*  inlock;
-    void*  outlock;
+    void*  inlock;  //录入同步锁
+    void*  outlock; //播放同步锁
 
     double time;
-    int inchannels;
-    int outchannels;
-    int sr;
+    int inchannels; //输入的声道数量
+    int outchannels; //输出的声道数量
+    int sampleRate; //采样率
 
 } OPENSL_STREAM;
 
@@ -94,7 +97,7 @@ typedef struct opensl_stream {
   Open the audio device with a given sampling rate (sr), input and output channels and IO buffer size
   in frames. Returns a handle to the OpenSL stream
 */
-OPENSL_STREAM* android_OpenAudioDevice(int sr, int inchannels, int outchannels, int bufferframes);
+OPENSL_STREAM* android_OpenAudioDevice(int sr, int inchannels, int outchannels, int bufferframes , int mode);
 
 /*
   Close the audio device
