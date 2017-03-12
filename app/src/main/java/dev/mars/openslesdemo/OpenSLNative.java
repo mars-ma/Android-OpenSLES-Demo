@@ -11,7 +11,7 @@ public class OpenSLNative {
     private AtomicBoolean isRecording = new AtomicBoolean(false);
     private AtomicBoolean isPlaying = new AtomicBoolean(false);
     static {
-        System.loadLibrary("opensl-lib");
+        System.loadLibrary("opensl");
     }
 
     public void setIsRecording(boolean v){

@@ -11,16 +11,14 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            abiFilters 'armeabi'
         }
         externalNativeBuild {
             cmake {
-                // With android studio 2.2.0 +cmake, app needs to pack shared lib to
-                // into APK. Refer to CMakeLists.txt for details
-                arguments '-DANDROID_STL=c++_shared', '-DANDROID_TOOLCHAIN=clang',
-                        '-DANDROID_PLATFORM=android-14'
+                arguments '-DANDROID_TOOLCHAIN=clang','-DANDROID_STL=gnustl_static'
             }
         }
+        //, 'arm64-v8a', 'x86', 'x86_64'
     }
     buildTypes {
         release {
@@ -30,7 +28,7 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path "CMakeLists.txt"
+            path "src/main/cpp/CMakeLists.txt"
         }
     }
 }

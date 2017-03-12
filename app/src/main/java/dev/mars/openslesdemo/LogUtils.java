@@ -8,6 +8,6 @@ import android.util.Log;
 
 public class LogUtils {
     public static void DEBUG(String msg){
-        android.util.Log.e("dev_mars",msg);
+        android.util.Log.d("dev_mars",msg);
     }
 }

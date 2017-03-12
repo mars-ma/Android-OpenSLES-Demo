@@ -27,8 +27,9 @@ struct OpenSLEngine{
 
 };
 
-extern "C" {
 
+
+extern "C" {
 
 
 JNIEXPORT void JNICALL
