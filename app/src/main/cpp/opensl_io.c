@@ -312,7 +312,7 @@ OPENSL_STREAM *android_OpenAudioDevice(uint32_t sr, uint32_t inchannels, uint32_
 {
     OPENSL_STREAM *p;
     //分配内存空间并初始化
-    p = (OPENSL_STREAM *) calloc(sizeof(OPENSL_STREAM),1);
+    p = (OPENSL_STREAM *) calloc(1,sizeof(OPENSL_STREAM));
     //采样率
     p->sampleRate = sr;
 
