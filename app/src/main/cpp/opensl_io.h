@@ -67,29 +67,29 @@ typedef struct opensl_stream {
     SLAndroidSimpleBufferQueueItf recorderBufferQueue;
 
     // buffer indexes
-    int currentInputIndex;
-    int currentOutputIndex;
+    uint32_t currentInputIndex;
+    uint32_t currentOutputIndex;
 
     // current buffer half (0, 1)
-    int currentOutputBuffer;
-    int currentInputBuffer;
+    uint8_t currentOutputBuffer;
+    uint8_t currentInputBuffer;
   
     // buffers
-    short *outputBuffer[2];
-    short *inputBuffer[2];
+    uint16_t *outputBuffer[2];
+    uint16_t *inputBuffer[2];
 
     // size of buffers
-    int outBufSamples; //播放缓冲数组的大小
-    int inBufSamples;  //录入缓冲数组的大小
+    uint32_t outBufSamples; //播放缓冲数组的大小
+    uint32_t inBufSamples;  //录入缓冲数组的大小
 
     // locks
     void*  inlock;  //录入同步锁
     void*  outlock; //播放同步锁
 
     double time;
-    int inchannels; //输入的声道数量
-    int outchannels; //输出的声道数量
-    int sampleRate; //采样率
+    uint32_t inchannels; //输入的声道数量
+    uint32_t outchannels; //输出的声道数量
+    uint32_t sampleRate; //采样率
 
 } OPENSL_STREAM;
 
@@ -97,7 +97,7 @@ typedef struct opensl_stream {
   Open the audio device with a given sampling rate (sr), input and output channels and IO buffer size
   in frames. Returns a handle to the OpenSL stream
 */
-OPENSL_STREAM* android_OpenAudioDevice(int sr, int inchannels, int outchannels, int bufferframes , int mode);
+OPENSL_STREAM* android_OpenAudioDevice(uint32_t sr, uint32_t inchannels, uint32_t outchannels, uint32_t bufferframes , uint32_t mode);
 
 /*
   Close the audio device
@@ -107,12 +107,12 @@ void android_CloseAudioDevice(OPENSL_STREAM *p);
 /*
   Read a buffer from the OpenSL stream *p, of size samples. Returns the number of samples read.
 */
-int android_AudioIn(OPENSL_STREAM *p, short *buffer,int size);
+uint32_t android_AudioIn(OPENSL_STREAM *p, uint16_t *buffer,uint32_t size);
 
 /*
   Write a buffer to the OpenSL stream *p, of size samples. Returns the number of samples written.
 */
-int android_AudioOut(OPENSL_STREAM *p, short *buffer,int size);
+uint32_t android_AudioOut(OPENSL_STREAM *p, uint16_t *buffer,uint32_t size);
 
 /*
   Get the current IO block time in seconds

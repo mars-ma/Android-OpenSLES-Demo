@@ -51,7 +51,7 @@ Java_dev_mars_openslesdemo_OpenSLNative_startRecording(JNIEnv *env, jobject inst
     }
 
     //参数依次为采样率、频道数量、录入频道数量、播放频道数量，每帧的大学，模式
-    int FRAME_SIZE = sampleRate*periodTime/1000;
+    uint32_t FRAME_SIZE = sampleRate*periodTime/1000;
     OPENSL_STREAM* stream = android_OpenAudioDevice(sampleRate, channels, channels,FRAME_SIZE ,RECORD_MODE);
     if (stream == NULL) {
         fclose(fp);
@@ -62,10 +62,10 @@ Java_dev_mars_openslesdemo_OpenSLNative_startRecording(JNIEnv *env, jobject inst
 
     LOG("IN RECORDING STATE");
     env->CallVoidMethod(instance,method_id_setIsRecording, true);
-    int samples;
-    //缓冲数组,一个short表示16bit位宽
-    int BUFFER_SIZE = FRAME_SIZE*channels;
-    short buffer[BUFFER_SIZE];
+    uint32_t samples;
+    //缓冲数组,单位usigned short,16bit
+    uint32_t BUFFER_SIZE = FRAME_SIZE*channels;
+    uint16_t buffer[BUFFER_SIZE];
     g_loop_exit = 0;
     while (!g_loop_exit) {
         samples = android_AudioIn(stream, buffer, BUFFER_SIZE);
@@ -73,7 +73,7 @@ Java_dev_mars_openslesdemo_OpenSLNative_startRecording(JNIEnv *env, jobject inst
             LOG("android_AudioIn failed !\n");
             break;
         }
-        if (fwrite((unsigned char *)buffer, samples*sizeof(short), 1, fp) != 1) {
+        if (fwrite(buffer, samples*sizeof(uint16_t), 1, fp) != 1) {
             LOG("failed to save captured data !\n ");
             break;
         }
@@ -107,7 +107,7 @@ Java_dev_mars_openslesdemo_OpenSLNative_playRecording(JNIEnv *env, jobject insta
         LOG("open file %s",audio_path);
     }
 
-    int FRAME_SIZE = sampleRate*periodTime/1000;
+    uint32_t FRAME_SIZE = sampleRate*periodTime/1000;
     OPENSL_STREAM* stream = android_OpenAudioDevice(sampleRate, channels, channels, FRAME_SIZE,PLAY_MODE);
     if (stream == NULL) {
         fclose(fp);
@@ -119,10 +119,10 @@ Java_dev_mars_openslesdemo_OpenSLNative_playRecording(JNIEnv *env, jobject insta
     env->CallVoidMethod(instance,method_id_setIsPlaying, true);
     int samples;
     int BUFFER_SIZE = FRAME_SIZE*channels;
-    short buffer[BUFFER_SIZE];
+    uint16_t buffer[BUFFER_SIZE];
     g_loop_exit = 0;
     while (!g_loop_exit && !feof(fp)) {
-        if (fread((unsigned char *)buffer, BUFFER_SIZE*2, 1, fp) != 1) {
+        if (fread(buffer, BUFFER_SIZE*sizeof(uint16_t), 1, fp) != 1) {
             LOG("failed to read data \n ");
             break;
         }

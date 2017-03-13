@@ -308,7 +308,7 @@ static void openSLDestroyEngine(OPENSL_STREAM *p)
 }
 
 // open the android audio device for input and/or output
-OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, int bufferframes,int mode)
+OPENSL_STREAM *android_OpenAudioDevice(uint32_t sr, uint32_t inchannels, uint32_t outchannels, uint32_t bufferframes,uint32_t mode)
 {
     OPENSL_STREAM *p;
     //分配内存空间并初始化
@@ -330,8 +330,8 @@ OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, 
         p->inlock = createThreadLock();
         if((p->inBufSamples = bufferframes*inchannels) != 0){
             //初始化录入缓冲数组
-            if((p->inputBuffer[0] = (short *) calloc(p->inBufSamples, sizeof(short))) == NULL ||
-               (p->inputBuffer[1] = (short *) calloc(p->inBufSamples, sizeof(short))) == NULL){
+            if((p->inputBuffer[0] = (uint16_t *) calloc(p->inBufSamples, sizeof(uint16_t))) == NULL ||
+               (p->inputBuffer[1] = (uint16_t *) calloc(p->inBufSamples, sizeof(uint16_t))) == NULL){
                 android_CloseAudioDevice(p);
                 return NULL;
             }
@@ -355,8 +355,8 @@ OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, 
         p->outlock = createThreadLock();
         if((p->outBufSamples = bufferframes*outchannels) != 0) {
             //初始化播放缓冲数组
-            if((p->outputBuffer[0] = (short *) calloc(p->outBufSamples, sizeof(short))) == NULL ||
-               (p->outputBuffer[1] = (short *) calloc(p->outBufSamples, sizeof(short))) == NULL) {
+            if((p->outputBuffer[0] = (uint16_t *) calloc(p->outBufSamples, sizeof(uint16_t))) == NULL ||
+               (p->outputBuffer[1] = (uint16_t *) calloc(p->outBufSamples, sizeof(uint16_t))) == NULL) {
                 android_CloseAudioDevice(p);
                 return NULL;
             }
@@ -435,25 +435,25 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 }
  
 // gets a buffer of size samples from the device
-int android_AudioIn(OPENSL_STREAM *p,short *buffer,int size)
+uint32_t android_AudioIn(OPENSL_STREAM *p,uint16_t *buffer,uint32_t size)
 {
-    short *inBuffer;
+    uint16_t *inBuffer;
     //录音缓冲数组的大小
-    int bufsamps = p->inBufSamples;
-    int index = p->currentInputIndex;
+    uint32_t bufsamps = p->inBufSamples;
+    uint32_t index = p->currentInputIndex;
     if(p == NULL || bufsamps ==  0) return 0;
     //得到缓冲数组指针
     inBuffer = p->inputBuffer[p->currentInputBuffer];
-    int i;
+    uint32_t i;
     for(i=0; i < size; i++){
         if (index >= bufsamps) {
             waitThreadLock(p->inlock);
-            (*p->recorderBufferQueue)->Enqueue(p->recorderBufferQueue,inBuffer,bufsamps*sizeof(short));
+            (*p->recorderBufferQueue)->Enqueue(p->recorderBufferQueue,inBuffer,bufsamps*sizeof(uint16_t));
             p->currentInputBuffer = (p->currentInputBuffer ? 0 : 1);
             index = 0;
             inBuffer = p->inputBuffer[p->currentInputBuffer];
         }
-        buffer[i] = (short)inBuffer[index++];
+        buffer[i] = (uint16_t)inBuffer[index++];
     }
     p->currentInputIndex = index;
     if(p->outchannels == 0) p->time += (double) size/(p->sampleRate*p->inchannels);
@@ -469,19 +469,19 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 }
 
 // puts a buffer of size samples to the device
-int android_AudioOut(OPENSL_STREAM *p, short *buffer,int size)
+uint32_t android_AudioOut(OPENSL_STREAM *p, uint16_t *buffer,uint32_t size)
 {
-    short *outBuffer;
-    int i, bufsamps = p->outBufSamples, index = p->currentOutputIndex;
+    uint16_t *outBuffer;
+    uint32_t i, bufsamps = p->outBufSamples, index = p->currentOutputIndex;
     if(p == NULL  || bufsamps ==  0)  return 0;
         outBuffer = p->outputBuffer[p->currentOutputBuffer];
 
     for(i=0; i < size; i++){
-        outBuffer[index++] = (short)(buffer[i]);
+        outBuffer[index++] = (uint16_t)(buffer[i]);
         if (index >= p->outBufSamples) {
             waitThreadLock(p->outlock);
             (*p->bqPlayerBufferQueue)->Enqueue(p->bqPlayerBufferQueue,
-			outBuffer,bufsamps*sizeof(short));
+			outBuffer,bufsamps*sizeof(uint16_t));
             p->currentOutputBuffer = (p->currentOutputBuffer ?  0 : 1);
             index = 0;
             outBuffer = p->outputBuffer[p->currentOutputBuffer];
