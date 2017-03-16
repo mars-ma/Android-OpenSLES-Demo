@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:onClick="startRecord"
         android:layout_alignParentTop="true"
-        android:text="Start_Record"
+        android:text="通过opensl录制pcm"
         />
 
     <Button
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:onClick="stopRecord"
         android:layout_below="@+id/btnStart"
-        android:text="Stop_Record"
+        android:text="停止录制"
         />
 
     <Button
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:onClick="startPlay"
         android:layout_below="@+id/btnStop"
-        android:text="Start_Play"
+        android:text="通过opensl播放pcm"
         />
 
     <Button
@@ -48,21 +48,39 @@
         android:layout_height="wrap_content"
         android:onClick="stopPlay"
         android:layout_below="@+id/btnStartPlay"
-        android:text="Stop_Play"
+        android:text="停止播放"
         />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="encodeWithSpeex"
-            android:text="encodeWithSpeex"
+            android:text="用speex对录制的pcm编码"
             />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="decodeWithSpeex"
-            android:text="decodeWithSpeex"
+            android:text="用speex对编码的speex音频解码并生成新的pcm"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="playOutpuPCM"
+            android:text="播放解码生成的pcm"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="recordAndPlayPCM"
+            android:text="PCM录制并播放"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="stopRecordAndPlayPCM"
+            android:text="停止PCM录制并播放"
             />
     </LinearLayout>
 </ScrollView>

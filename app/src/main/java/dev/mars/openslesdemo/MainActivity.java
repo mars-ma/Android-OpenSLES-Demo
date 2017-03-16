@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
     private OpenSLRecorder recorder;
     private OpenSLPlayer player;
     private SpeexUtils speexUtils;
+    private AudioUtils audioUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
         recorder = new OpenSLRecorder();
         player = new OpenSLPlayer();
         speexUtils = new SpeexUtils();
+        audioUtils= new AudioUtils();
     }
 
 
@@ -109,5 +111,29 @@ public class MainActivity extends AppCompatActivity {
 
     public void decodeWithSpeex(View view) {
         speexUtils.decode(Common.DEFAULT_SPEEX_FILE_PATH,Common.DEFAULT_PCM_OUTPUT_FILE_PATH);
+    }
+
+    public void playOutpuPCM(View view) {
+        if(!player.startToPlay(Common.SAMPLERATE,Common.PERIOD_TIME,Common.CHANNELS,Common.DEFAULT_PCM_OUTPUT_FILE_PATH)){
+            Toast.makeText(MainActivity.this,"Is playing!",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(MainActivity.this,"Start playing!",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void recordAndPlayPCM(View view) {
+        if(!audioUtils.recordAndPlayPCM(Common.SAMPLERATE,Common.PERIOD_TIME,Common.CHANNELS)){
+            Toast.makeText(MainActivity.this,"Is recording and playing!",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(MainActivity.this,"Start recording and playing!",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void stopRecordAndPlayPCM(View view) {
+        if(!audioUtils.stopRecordAndPlay()){
+            Toast.makeText(MainActivity.this,"not in recording and playing state!",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(MainActivity.this,"recording and playing stoped!",Toast.LENGTH_SHORT).show();
+        }
     }
 }

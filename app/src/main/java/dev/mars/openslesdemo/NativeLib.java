@@ -10,6 +10,7 @@ public class NativeLib {
 
     private AtomicBoolean isRecording = new AtomicBoolean(false);
     private AtomicBoolean isPlaying = new AtomicBoolean(false);
+    private AtomicBoolean isRecordAndPlay=new AtomicBoolean(false);
     static {
         System.loadLibrary("native");
     }
@@ -17,6 +18,11 @@ public class NativeLib {
     public void setIsRecording(boolean v){
         isRecording.set(v);
         LogUtils.DEBUG("setIsRecording "+v);
+    }
+
+    public void setIsRecordingAndPlaying(boolean v){
+        isRecordAndPlay.set(v);
+        LogUtils.DEBUG("setIsRecordingAndPlaying "+v);
     }
 
     public boolean isRecording(){
@@ -31,10 +37,18 @@ public class NativeLib {
         return isPlaying.get();
     }
 
+    public boolean isRecordingAndPlaying(){
+        return isRecordAndPlay.get();
+    }
+
     public native void startRecording(int sampleRate, int period, int channels, String path);
     public native void stopRecording();
     public native void playRecording(int sampleRate, int period, int channels, String path);
     public native void stopPlaying();
     public native int encode(String pcm,String speex);
     public native int decode(String speex,String pcm);
+
+    public native int recordAndPlayPCM(int sampleRate, int period, int channels);
+
+    public native int stopRecordingAndPlaying() ;
 }
