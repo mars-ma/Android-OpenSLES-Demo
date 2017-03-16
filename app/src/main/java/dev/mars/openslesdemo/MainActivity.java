@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
     String[] pers = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO};
     private OpenSLRecorder recorder;
     private OpenSLPlayer player;
+    private SpeexUtils speexUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         recorder = new OpenSLRecorder();
         player = new OpenSLPlayer();
+        speexUtils = new SpeexUtils();
     }
 
 
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startToRecord(){
-        if(!recorder.startToRecord(Common.SAMPLERATE,Common.PERIOD_TIME,Common.CHANNELS,Common.DEFAULT_AUDIO_FILE_PATH)){
+        if(!recorder.startToRecord(Common.SAMPLERATE,Common.PERIOD_TIME,Common.CHANNELS,Common.DEFAULT_PCM_FILE_PATH)){
             Toast.makeText(MainActivity.this,"Already in recording state!",Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(MainActivity.this,"Start recording!",Toast.LENGTH_SHORT).show();
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void startPlay(View view) {
-        if(!player.startToPlay(Common.SAMPLERATE,Common.PERIOD_TIME,Common.CHANNELS,Common.DEFAULT_AUDIO_FILE_PATH)){
+        if(!player.startToPlay(Common.SAMPLERATE,Common.PERIOD_TIME,Common.CHANNELS,Common.DEFAULT_PCM_FILE_PATH)){
             Toast.makeText(MainActivity.this,"Is playing!",Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(MainActivity.this,"Start playing!",Toast.LENGTH_SHORT).show();
@@ -99,5 +101,13 @@ public class MainActivity extends AppCompatActivity {
         }else{
             Toast.makeText(MainActivity.this,"Playing stopped!",Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void encodeWithSpeex(View view) {
+        speexUtils.encode(Common.DEFAULT_PCM_FILE_PATH,Common.DEFAULT_SPEEX_FILE_PATH);
+    }
+
+    public void decodeWithSpeex(View view) {
+        speexUtils.decode(Common.DEFAULT_SPEEX_FILE_PATH,Common.DEFAULT_PCM_OUTPUT_FILE_PATH);
     }
 }

@@ -10,9 +10,9 @@ import java.util.concurrent.Executors;
 
 public class OpenSLRecorder {
     private ExecutorService executor = Executors.newSingleThreadExecutor();
-    private OpenSLNative nativeBridge;
+    private NativeLib nativeBridge;
     public OpenSLRecorder(){
-        nativeBridge= new OpenSLNative();
+        nativeBridge= new NativeLib();
     }
 
     public boolean startToRecord(final int sampleRate, final int period, final int channels, final String path){

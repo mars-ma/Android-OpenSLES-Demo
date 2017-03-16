@@ -11,7 +11,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
-            abiFilters 'armeabi'
+            abiFilters 'armeabi','arm64-v8a', 'x86'
         }
         externalNativeBuild {
             cmake {
@@ -28,7 +28,7 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path "src/main/cpp/CMakeLists.txt"
+            path "src/main/jni/CMakeLists.txt"
         }
     }
 }
