@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,11 +16,14 @@ public class MainActivity extends AppCompatActivity {
     private OpenSLPlayer player;
     private SpeexUtils speexUtils;
     private AudioUtils audioUtils;
+    CheckBox cb1,cb2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        cb1 = (CheckBox) findViewById(R.id.cb1);
+        cb2 = (CheckBox) findViewById(R.id.cb2);
         recorder = new OpenSLRecorder();
         player = new OpenSLPlayer();
         speexUtils = new SpeexUtils();
@@ -122,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void recordAndPlayPCM(View view) {
-        if(!audioUtils.recordAndPlayPCM(Common.SAMPLERATE,Common.PERIOD_TIME,Common.CHANNELS)){
+        if(!audioUtils.recordAndPlayPCM(cb1.isChecked(),cb2.isChecked())){
             Toast.makeText(MainActivity.this,"Is recording and playing!",Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(MainActivity.this,"Start recording and playing!",Toast.LENGTH_SHORT).show();

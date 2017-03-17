@@ -48,7 +48,7 @@ public class NativeLib {
     public native int encode(String pcm,String speex);
     public native int decode(String speex,String pcm);
 
-    public native int recordAndPlayPCM(int sampleRate, int period, int channels);
+    public native int recordAndPlayPCM(boolean enableProcess,boolean enableEchoCancel);
 
     public native int stopRecordingAndPlaying() ;
 }

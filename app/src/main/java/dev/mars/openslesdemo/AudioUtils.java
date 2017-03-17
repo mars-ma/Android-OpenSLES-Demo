@@ -16,12 +16,12 @@ public class AudioUtils {
         nativeBridge = new NativeLib();
     }
 
-    public boolean recordAndPlayPCM(final int sampleRate, final int period, final int channels){
+    public boolean recordAndPlayPCM(final boolean enable1, final boolean enable2){
         if(!nativeBridge.isRecordingAndPlaying()) {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    nativeBridge.recordAndPlayPCM(sampleRate, period, channels);
+                    nativeBridge.recordAndPlayPCM(enable1,enable2);
                 }
             });
             return true;
