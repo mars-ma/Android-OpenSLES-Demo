@@ -43,7 +43,7 @@ Java_dev_mars_openslesdemo_NativeLib_stopRecordingAndPlaying(JNIEnv *env, jobjec
 
 JNIEXPORT jint JNICALL
 Java_dev_mars_openslesdemo_NativeLib_recordAndPlayPCM(JNIEnv *env, jobject instance,jboolean enableProcess,jboolean enableEchoCancel) {
-
+    bool initEchoBuffer = false;
     SpeexPreprocessState *preprocess_state;
     SpeexEchoState *echo_state;
     spx_int16_t echo_buf[SPEEX_FRAME_SIZE],echo_canceled_buf[SPEEX_FRAME_SIZE];
@@ -141,13 +141,11 @@ Java_dev_mars_openslesdemo_NativeLib_recordAndPlayPCM(JNIEnv *env, jobject insta
         if(enableEchoCancel||enableProcess){
             ptr = (spx_int16_t *) buffer;
         }
-        if(enableEchoCancel){
+        if(enableEchoCancel&&initEchoBuffer){
             /**
              * 将录音的数组复制一份给回声数组
              */
-            for(int i=0;i<SPEEX_FRAME_SIZE;i++){
-                echo_buf[i] = *(ptr+i);
-            }
+            //第二个参数就是上一次播放的音频数据
             speex_echo_cancellation(echo_state, ptr, echo_buf, echo_canceled_buf);
             for(int i=0;i<SPEEX_FRAME_SIZE;i++){
                 *(ptr+i) = echo_canceled_buf[i];
@@ -165,8 +163,13 @@ Java_dev_mars_openslesdemo_NativeLib_recordAndPlayPCM(JNIEnv *env, jobject insta
                 LOG("noise/silence");
             }
         }
-
-
+        if(enableEchoCancel){
+            //将播放的录音数据作为回声消除的第二个参数
+            initEchoBuffer = true;
+            for(int i=0;i<SPEEX_FRAME_SIZE;i++){
+                echo_buf[i] = *(ptr+i);
+            }
+        }
         samples = android_AudioOut(stream_play, buffer, SPEEX_FRAME_SIZE);
         if (samples < 0) {
             LOG("android_AudioOut failed !\n");
